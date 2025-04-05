@@ -1,7 +1,7 @@
 import Sequelize from 'sequelize';
 
-import getUserModel from './user';
-import getMessageModel from './message';
+import getUserModel from './user.js';
+import getMessageModel from './message.js';
 
 const sequelize = new Sequelize(
   process.env.DATABASE,
@@ -9,6 +9,7 @@ const sequelize = new Sequelize(
   process.env.DATABASE_PASSWORD,
   {
     dialect: 'postgres',
+    host: process.env.HOST
   },
 );
 
