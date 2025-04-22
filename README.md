@@ -127,4 +127,184 @@ kubectl label node kind-control-plane ingress-ready=true
 Website is now available on the :http://nginx.local:8080/
 adding this enttry inside the /etc/hosts/ file and using the link.
 
+6) Create a statefulsets for the nginx  for having shared volumes:
+
+For PVC:
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: shared-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+
+For Services file:
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-headless
+spec:
+  clusterIP: None
+  selector:
+    app: nginx
+  ports:
+    - port: 80
+      name: web
+---
+
+For Stateful sets:
+kind: StatefulSet
+metadata:
+  name: nginx
+spec:
+  serviceName: nginx-headless
+  replicas: 1   # Only 1 pod can use ReadWriteOnce PVC
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:latest
+          ports:
+            - containerPort: 80
+              name: web
+          volumeMounts:
+            - name: shared-storage
+              mountPath: /usr/share/nginx/html
+    volumes:
+        - name: shared-storage
+          persistentVolumeClaim:
+            claimName: shared-pvc
+
+
+
+**OR ELSE create it with seperate PVC's: 
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-headless
+spec:
+  clusterIP: None
+  selector:
+    app: nginx
+  ports:
+    - port: 80
+      name: web
+---**
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: nginx
+spec:
+  serviceName: nginx-headless
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+          name: web
+        volumeMounts:
+        - name: www
+          mountPath: /usr/share/nginx/html
+  volumeClaimTemplates:
+  - metadata:
+      name: www
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 1Gi
+
+
+use, **kubectl apply -f StatefulSets.yaml**.
+
+kubectl get pvc.
+
+7) 
+
+ConfigMap:
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  APP_ENV: "production"
+  LOG_LEVEL: "info"
+
+Secrets
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: app-secret
+type: Opaque
+stringData:
+  DB_USER: "admin"
+  DB_PASSWORD: "supersecret"
+
+
+Deployments: 
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: my-app
+  template:
+    metadata:
+      labels:
+        app: my-app
+    spec:
+      containers:
+        - name: my-app-container
+          image: nginx:latest
+          env:
+            # From ConfigMap
+            - name: APP_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: APP_ENV
+            - name: APP_DEBUG
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: APP_DEBUG
+
+            # From Secret
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: DB_USER
+            - name: DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: DB_PASS
+
 
