@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deployment
+  labels:
+    app: frontend
+spec:
+  replicas: {{ .Values.frontend.replicas }}
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      nodeName: {{ .Values.frontend.nodeName }}
+      containers:
+      - name: frontend
+        image: {{ .Values.frontend.image }}
+        env:
+          - name: HOST
+            valueFrom:
+              configMapKeyRef:
+                name: postgres-config
+                key: host
+          - name: DATABASE
+            valueFrom:
+              configMapKeyRef:
+                name: postgres-config
+                key: database_name
+          - name: DATABASE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: postgres-secret
+                key: postgres-password
+          - name: DATABASE_USER
+            valueFrom:
+              configMapKeyRef:
+                name: postgres-config
+                key: database_user
+        ports:
+          - containerPort: {{ .Values.frontend.containerPort }}
+

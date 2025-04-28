@@ -1,0 +1,24 @@
+frontend:
+  image: pratyush0630/frontend-app:latest
+  replicas: 1
+  nodeName: kind-for-assigment-control-plane
+  containerPort: 3000
+  service:
+    type: NodePort
+    nodePort: 30003
+
+postgres:
+  image: postgres:17.4
+  replicas: 1
+  containerPort: 5432
+  storage: 1Gi
+  database:
+    name: mydatabase
+    user: postgres
+    password: postgres  # this will be base64 encoded
+
+configmap:
+  databaseNameKey: mydatabase
+  host: postgres-service
+  databaseUserKey: postgres
+
