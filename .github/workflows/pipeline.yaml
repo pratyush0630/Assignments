@@ -59,7 +59,7 @@ jobs:
         run: |
           docker push ${{ secrets.DOCKER_USERNAME }}/sharks-test:$NEW_TAG
 
-      - name: Update helm values.yaml with new image tag
+      - name: Update gitops values.yaml with new image tag
         run: |
           sed -i "s/tag: .*/tag: $NEW_TAG/" values.yaml
           
