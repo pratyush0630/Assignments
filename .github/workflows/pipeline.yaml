@@ -11,7 +11,8 @@ on:
     branches:
       - Helm
     paths:
-      - Dockerfile 
+      - Dockerfile
+  workflow_dispatch:   
 
 jobs:
   build:
