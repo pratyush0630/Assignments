@@ -1,5 +1,5 @@
 
-name: Docker build and Helm Update
+name: The Docker build and Helm Update assignment 
 
 on: 
   push: 
@@ -63,7 +63,7 @@ jobs:
           git config --global user.name "pratyush0630"
           BRANCH_NAME=${GITHUB_REF#refs/heads/}  
           echo $BRANCH_NAME
-          git checkout helm 
+          git checkout gitops 
           git add values.yaml
           git commit -m "Update Docker image tag to $NEW_TAG in values.yaml"
-          git push origin helm 
+          git push origin gitops
