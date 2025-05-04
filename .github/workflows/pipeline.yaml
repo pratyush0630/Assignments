@@ -31,7 +31,8 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
        
       - name: Print Username
-        run: echo "Username: ${{ secrets.DOCKER_USERNAME }}"
+        run: |
+          echo "Username: ${{ secrets.DOCKER_USERNAME }}"
 
       - name: Build Docker image
         run: |
