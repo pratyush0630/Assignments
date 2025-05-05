@@ -6,7 +6,7 @@ on:
     branch: 
       - gitops
     paths:
-      -  Dockerfile
+      - Dockerfile
   pull_request:
     branches:
       - gitops
