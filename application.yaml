@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: myapp-argocd-application
+  namespace: argo_cd
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/pratyush0630/Assignments.git
+    targetRevision: HEAD
+    path: dev
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: my-application-namespace
+
+  syncPolicy:
+    syncOptions: 
+    - createNamespace=true
+
+    automated: 
+      selfHeal: true
+      prune: true
