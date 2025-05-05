@@ -4,12 +4,12 @@ name: Docker build and Helm Update
 on: 
   push: 
     branch: 
-      - Helm
+      - helm
     paths:
       -  Dockerfile
   pull_request:
     branches:
-      - Helm
+      - helm
     paths:
       - Dockerfile 
 
