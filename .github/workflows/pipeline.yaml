@@ -3,7 +3,7 @@ name: The Docker build and Helm Update assignment
 
 on: 
   push: 
-    branch: 
+    branches: 
       - gitops
     paths:
       - Dockerfile
